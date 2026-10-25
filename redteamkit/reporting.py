@@ -1,0 +1,131 @@
+"""
+Professional report generation for red team / purple team engagements.
+"""
+
+from datetime import datetime, timezone
+from typing import List, Dict, Any, Optional
+from .campaign import Campaign
+from .detection import DetectionMatrix, GapAnalyzer
+from .profiles import load_profile
+from .attack import AttackLibrary
+
+
+class ReportBuilder:
+    """Generate structured engagement reports (text / markdown)."""
+
+    def __init__(self):
+        self.lib = AttackLibrary()
+
+    def executive_summary(
+        self,
+        campaign: Campaign,
+        detection_rate: float = 0.0,
+        key_findings: Optional[List[str]] = None,
+        residual_risk: str = "Medium",
+    ) -> str:
+        key_findings = key_findings or [
+            "Detection coverage incomplete against emulated adversary TTPs",
+            "Credential access and lateral movement paths require additional monitoring",
+            "Response times exceeded target thresholds on high-priority techniques",
+        ]
+        lines = [
+            "# Executive Summary",
+            "",
+            f"**Engagement:** {campaign.name}",
+            f"**Adversary Emulated:** {campaign.adversary}",
+            f"**Duration:** {campaign.duration_days} days",
+            f"**Date:** {datetime.now(timezone.utc).strftime('%Y-%m-%d')}",
+            "",
+            "## Objectives",
+        ]
+        for o in campaign.objectives:
+            lines.append(f"- {o}")
+        lines += [
+            "",
+            "## Key Results",
+            f"- Techniques exercised: **{campaign.technique_count()}**",
+            f"- Overall detection rate: **{detection_rate:.1f}%**",
+            f"- Residual risk rating: **{residual_risk}**",
+            "",
+            "## Critical Findings",
+        ]
+        for i, f in enumerate(key_findings, 1):
+            lines.append(f"{i}. {f}")
+        lines += [
+            "",
+            "## Recommendations (Priority Order)",
+            "1. Close critical detection gaps on credential dumping and lateral movement",
+            "2. Improve mean-time-to-detect for high-priority techniques to ≤ 30 minutes",
+            "3. Strengthen identity controls (MFA, conditional access, tiered admin)",
+            "4. Implement or tune behavioral detections for living-off-the-land binaries",
+            "5. Conduct purple-team follow-up within 90 days to validate improvements",
+            "",
+        ]
+        return "\n".join(lines)
+
+    def technical_timeline(self, campaign: Campaign) -> str:
+        lines = [
+            "# Technical Timeline & ATT&CK Coverage",
+            "",
+            f"Campaign ID: `{campaign.campaign_id}`",
+            f"Adversary: {campaign.adversary} | Fidelity: {campaign.fidelity}",
+            "",
+        ]
+        for phase in sorted(campaign.phases, key=lambda p: p.order):
+            lines.append(f"## Phase {phase.order}: {phase.name} ({phase.duration_days} days)")
+            lines.append(f"**Objectives:** {', '.join(phase.objectives)}")
+            if phase.success_criteria:
+                lines.append(f"**Success criteria:** {phase.success_criteria}")
+            lines.append("")
+            lines.append("| Technique | Name | Tactic |")
+            lines.append("|-----------|------|--------|")
+            for tid in phase.techniques:
+                t = self.lib.get(tid)
+                name = t.name if t else "—"
+                tactic = t.tactic.name if t else "—"
+                lines.append(f"| {tid} | {name} | {tactic} |")
+            lines.append("")
+            if phase.opsec_notes:
+                lines.append(f"*OPSEC: {phase.opsec_notes}*")
+                lines.append("")
+        return "\n".join(lines)
+
+    def detection_appendix(self, matrix: DetectionMatrix) -> str:
+        analyzer = GapAnalyzer(matrix)
+        lines = [
+            "# Detection Validation Appendix",
+            "",
+            matrix.summary(),
+            "",
+            analyzer.report(),
+        ]
+        return "\n".join(lines)
+
+    def full_report(
+        self,
+        campaign: Campaign,
+        matrix: Optional[DetectionMatrix] = None,
+        key_findings: Optional[List[str]] = None,
+        residual_risk: str = "Medium",
+    ) -> str:
+        det_rate = matrix.detection_rate() if matrix else 0.0
+        parts = [
+            self.executive_summary(campaign, det_rate, key_findings, residual_risk),
+            "---",
+            self.technical_timeline(campaign),
+        ]
+        if matrix:
+            parts += ["---", self.detection_appendix(matrix)]
+        parts += [
+            "---",
+            "# Appendix — Adversary Profile",
+            "",
+        ]
+        profile = load_profile(campaign.adversary)
+        if profile:
+            parts.append(profile.summary())
+        else:
+            parts.append(f"Profile for {campaign.adversary} not found in library.")
+        parts.append("")
+        parts.append(f"*Report generated by RedTeamKit v3 — {datetime.now(timezone.utc).isoformat()}Z*")
+        return "\n".join(parts)
