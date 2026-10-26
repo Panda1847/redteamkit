@@ -5,12 +5,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from redteamkit.profiles import load_profile, list_profiles
-from redteamkit.campaign import CampaignPlanner
 from redteamkit.attack import AttackLibrary, Tactic
+from redteamkit.campaign import CampaignPlanner, Phase
+from redteamkit.cli import main
 from redteamkit.detection import DetectionMatrix
 from redteamkit.opsec import OpsecChecklist
-from redteamkit.cli import main
+from redteamkit.profiles import list_profiles, load_profile
 
 
 class TestProfiles(unittest.TestCase):
@@ -48,10 +48,15 @@ class TestCampaign(unittest.TestCase):
                     }, f"{tid} ({tech.tactic.name}) wrongly in Cleanup")
 
     def test_allow_destructive(self):
-        camp = CampaignPlanner().create(adversary="Lazarus", allow_destructive=True, exclude=[])
-        # When allow_destructive and empty exclude, T1486 can appear if in template/profile
-        # Just ensure the flag is respected (no forced exclusion)
+        phase = Phase(name="Impact test", order=1, techniques=["T1486"])
+        camp = CampaignPlanner().create(
+            adversary="Lazarus", custom_phases=[phase], allow_destructive=True, exclude=[]
+        )
         self.assertNotIn("T1486", camp.excluded_techniques)
+        self.assertIn("T1486", camp.phases[0].techniques)
+        safe = CampaignPlanner().create(adversary="Lazarus", custom_phases=[phase])
+        self.assertIn("T1486", safe.excluded_techniques)
+        self.assertNotIn("T1486", safe.phases[0].techniques)
 
 
 class TestDetection(unittest.TestCase):

@@ -2,9 +2,11 @@
 MITRE ATT&CK technique library and mapping utilities.
 """
 
-from enum import Enum
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Any
+from enum import Enum
+from typing import Any, Dict, List, Optional
+
+from .attackdata import AttackDataError, data_path, load_index
 
 
 class Tactic(Enum):
@@ -279,6 +281,25 @@ class AttackLibrary:
 
     def __init__(self):
         self.techniques = dict(_TECHNIQUES)
+        try:
+            index = load_index(data_path())
+        except AttackDataError:
+            index = {}
+        for record in (index.get("techniques") or {}).values():
+            technique_id = record.get("id")
+            tactic = next((item for item in Tactic if item.value == record.get("tactic_id")), None)
+            if not technique_id or tactic is None or technique_id in self.techniques:
+                continue
+            self.techniques[technique_id] = Technique(
+                technique_id=technique_id,
+                name=record.get("name", technique_id),
+                tactic=tactic,
+                description=record.get("description", ""),
+                platforms=record.get("platforms") or [],
+                data_sources=record.get("data_sources") or [],
+                detections=[record["detection"]] if record.get("detection") else [],
+                detection_priority=record.get("priority", "medium"),
+            )
 
     def get(self, technique_id: str) -> Optional[Technique]:
         return self.techniques.get(technique_id.upper())
@@ -321,3 +342,17 @@ class AttackLibrary:
 
 def get_technique(technique_id: str) -> Optional[Technique]:
     return AttackLibrary().get(technique_id)
+
+
+def data_version() -> str:
+    try:
+        return str(load_index(data_path()).get("attack_version", "unknown"))
+    except AttackDataError:
+        return "unknown"
+
+
+def data_source() -> str:
+    try:
+        return str(load_index(data_path()).get("source", "unknown"))
+    except AttackDataError:
+        return "unknown"

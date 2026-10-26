@@ -2,10 +2,14 @@
 Multi-phase campaign planner and timeline engine.
 """
 
-from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Any
-from datetime import datetime, timedelta, timezone
 import uuid
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
+
+
+class CampaignError(ValueError):
+    """Raised when a campaign cannot be built from its declared inputs."""
 
 
 @dataclass
@@ -138,7 +142,21 @@ class CampaignPlanner:
             name = f"{adversary} Emulation — {datetime.now(timezone.utc).strftime('%Y%m%d')}"
 
         if custom_phases:
-            phases = custom_phases
+            phases = []
+            for phase in custom_phases:
+                techniques = list(phase.techniques)
+                if not allow_destructive:
+                    techniques = [t for t in techniques if t not in exclude]
+                phases.append(Phase(
+                    name=phase.name,
+                    order=phase.order,
+                    objectives=list(phase.objectives),
+                    techniques=techniques,
+                    duration_days=phase.duration_days,
+                    opsec_notes=phase.opsec_notes,
+                    success_criteria=phase.success_criteria,
+                    abort_conditions=list(phase.abort_conditions),
+                ))
         else:
             phases = []
             for i, (pname, pobjs, techs, days) in enumerate(self.PHASE_TEMPLATES["default"], 1):
@@ -174,12 +192,12 @@ class CampaignPlanner:
         )
 
     def from_profile(self, profile_name: str, **kwargs) -> Campaign:
-        from .profiles import load_profile
         from .attack import AttackLibrary, Tactic
+        from .profiles import load_profile
 
         profile = load_profile(profile_name)
         if not profile:
-            raise ValueError(f"Unknown profile: {profile_name}")
+            raise CampaignError(f"Unknown profile: {profile_name}")
 
         # Prefer the profile's own TTP list for higher fidelity
         camp = self.create(adversary=profile.name, **kwargs)
@@ -208,6 +226,16 @@ class CampaignPlanner:
                 if (tech := lib.get(t)) and tech.tactic in allowed
             ]
             phase.techniques = list(dict.fromkeys(phase.techniques + extra))
+
+        if profile_ttps and not any(
+            tid in phase.techniques for phase in camp.phases for tid in profile_ttps
+        ):
+            from .attack import data_source
+            hint = "" if data_source() != "seed" else " The bundled ATT&CK data is a seed snapshot; run `redteamkit sync` first."
+            raise CampaignError(
+                f"profile {profile.name!r} lists {len(profile_ttps)} technique(s) "
+                f"but none matched a phase tactic. Check the profile TTP list.{hint}"
+            )
 
         camp.notes = profile.fidelity_notes or profile.operational_notes
         return camp

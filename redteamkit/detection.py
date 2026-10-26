@@ -2,9 +2,10 @@
 Detection validation matrix and gap analysis engine.
 """
 
-from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Any
-from .attack import AttackLibrary, Technique
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
+
+from .attack import AttackLibrary
 
 
 @dataclass

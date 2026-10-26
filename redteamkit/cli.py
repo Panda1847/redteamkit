@@ -15,14 +15,16 @@ Usage examples:
 import argparse
 import json
 import sys
-from typing import List
+from typing import List, Optional
 
-from .profiles import list_profiles, load_profile, search_profiles
 from .attack import AttackLibrary, Tactic
+from .attackdata import AttackDataError, load_index, print_header
+from .attackdata import sync as sync_attack_data
 from .campaign import CampaignPlanner
-from .detection import DetectionMatrix, GapAnalyzer
-from .reporting import ReportBuilder
+from .detection import DetectionMatrix
 from .opsec import OpsecChecklist
+from .profiles import list_profiles, load_profile
+from .reporting import ReportBuilder
 
 
 def cmd_profiles(args):
@@ -39,7 +41,8 @@ def cmd_profiles(args):
         print("Available adversary profiles:")
         for name in list_profiles():
             p = load_profile(name)
-            print(f"  {name:12} — {p.origin} | {p.motivation[:50]}")
+            source = "generated" if p.generated else "hand-maintained"
+            print(f"  {name:24} [{source:15}] — {p.origin or p.motivation[:50]}")
     return 0
 
 
@@ -187,10 +190,45 @@ def cmd_techniques(args):
     return 0
 
 
-def main(argv: List[str] = None):
+def cmd_sync(args):
+    try:
+        index = sync_attack_data(dry_run=args.dry_run, offline=args.offline)
+    except AttackDataError as exc:
+        print(f"ATT&CK sync failed: {exc}", file=sys.stderr)
+        return 1
+    print_header(index)
+    return 0
+
+
+def cmd_validate(args):
+    try:
+        index = load_index()
+    except AttackDataError as exc:
+        print(json.dumps({"valid": False, "error": str(exc)}))
+        return 1
+    profiles = []
+    for name in list_profiles():
+        profile = load_profile(name)
+        profiles.append({
+            "profile": name,
+            "generated": bool(profile.generated) if profile else False,
+            "technique_count": len(profile.ttps) if profile else 0,
+        })
+    result = {
+        "valid": True,
+        "attack_version": index.get("attack_version"),
+        "technique_count": index.get("technique_count", len(index.get("techniques", {}))),
+        "group_count": index.get("group_count", len(index.get("groups", {}))),
+        "profiles": profiles,
+    }
+    print(json.dumps(result, indent=2))
+    return 0
+
+
+def main(argv: Optional[List[str]] = None):
     parser = argparse.ArgumentParser(
         prog="redteamkit",
-        description="RedTeamKit — Authorized red team planning & simulation engine v3",
+        description="RedTeamKit — Authorized red team planning & simulation engine v3.2",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -238,6 +276,17 @@ def main(argv: List[str] = None):
     p.add_argument("--priority", choices=["critical", "high", "medium", "low"])
     p.add_argument("--search", "-s")
     p.set_defaults(func=cmd_techniques)
+
+    # ATT&CK data lifecycle
+    p = sub.add_parser("sync", help="Fetch and index the official ATT&CK Enterprise bundle")
+    p.add_argument("--dry-run", action="store_true", help="Validate and summarize without writing the index")
+    p.add_argument("--offline", action="store_true", help="Refuse network synchronization")
+    p.add_argument("--json", action="store_true", help="Emit the index header as JSON")
+    p.set_defaults(func=cmd_sync)
+
+    p = sub.add_parser("validate", help="Validate the local ATT&CK index and profile registry")
+    p.add_argument("--json", action="store_true", help="Emit JSON")
+    p.set_defaults(func=cmd_validate)
 
     args = parser.parse_args(argv)
     return args.func(args)

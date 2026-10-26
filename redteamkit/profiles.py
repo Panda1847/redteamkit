@@ -3,8 +3,7 @@ Adversary / APT profile library.
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Any
-from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
@@ -21,6 +20,7 @@ class AdversaryProfile:
     fidelity_notes: str = ""
     first_seen: Optional[str] = None
     last_seen: Optional[str] = None
+    generated: bool = False
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -34,6 +34,7 @@ class AdversaryProfile:
             "infrastructure": self.infrastructure,
             "operational_notes": self.operational_notes,
             "fidelity_notes": self.fidelity_notes,
+            "generated": self.generated,
         }
 
     def summary(self) -> str:
@@ -46,6 +47,7 @@ class AdversaryProfile:
             f"Key TTPs ({len(self.ttps)}): {', '.join(self.ttps[:12])}{'...' if len(self.ttps) > 12 else ''}",
             f"Tools: {', '.join(self.tools) or '—'}",
             f"Infra patterns: {', '.join(self.infrastructure) or '—'}",
+            f"Source: {'generated' if self.generated else 'hand-maintained'}",
         ]
         if self.operational_notes:
             lines.append(f"Ops notes: {self.operational_notes}")
@@ -56,6 +58,8 @@ class AdversaryProfile:
 
 # Built-in high-fidelity profiles
 _PROFILES: Dict[str, AdversaryProfile] = {}
+_GENERATED: Dict[str, AdversaryProfile] = {}
+_LOADED = False
 
 
 def _add(p: AdversaryProfile):
@@ -178,9 +182,10 @@ _add(AdversaryProfile(
 
 
 def list_profiles() -> List[str]:
+    registry = _build_registry()
     seen = set()
     names = []
-    for p in _PROFILES.values():
+    for p in registry.values():
         if p.name not in seen:
             seen.add(p.name)
             names.append(p.name)
@@ -188,15 +193,17 @@ def list_profiles() -> List[str]:
 
 
 def load_profile(name: str) -> Optional[AdversaryProfile]:
+    registry = _build_registry()
     key = name.lower().replace(" ", "").replace("-", "").replace("_", "")
-    return _PROFILES.get(key)
+    return registry.get(key)
 
 
 def search_profiles(keyword: str) -> List[AdversaryProfile]:
+    registry = _build_registry()
     kw = keyword.lower()
     results = []
     seen = set()
-    for p in _PROFILES.values():
+    for p in registry.values():
         if p.name in seen:
             continue
         if (kw in p.name.lower() or any(kw in a.lower() for a in p.aliases)
@@ -204,3 +211,57 @@ def search_profiles(keyword: str) -> List[AdversaryProfile]:
             results.append(p)
             seen.add(p.name)
     return results
+
+
+def load_generated_profiles(records: List[Dict[str, Any]]) -> None:
+    """Load ATT&CK-derived profiles into a separate registry."""
+    _GENERATED.clear()
+    for record in records:
+        name = record.get("name") or record.get("attack_id")
+        if not name:
+            continue
+        profile = AdversaryProfile(
+            name=name,
+            aliases=list(record.get("aliases") or []),
+            motivation="ATT&CK intrusion-set profile",
+            ttps=list(record.get("ttps") or []),
+            operational_notes=record.get("description", ""),
+            generated=True,
+        )
+        key = name.lower().replace(" ", "").replace("-", "").replace("_", "")
+        _GENERATED[key] = profile
+        for alias in profile.aliases:
+            _GENERATED[alias.lower().replace(" ", "").replace("-", "").replace("_", "")] = profile
+
+
+def _ensure_generated_loaded() -> None:
+    """Load ATT&CK-derived profiles once, tolerating a missing/seed index."""
+    global _LOADED
+    if _LOADED:
+        return
+    _LOADED = True
+    try:
+        from .attackdata import data_path, load_index
+        index = load_index(data_path())
+    except Exception:
+        return
+    records = []
+    for gid, group in (index.get("groups") or {}).items():
+        if not group.get("ttps") or group.get("deprecated") or group.get("revoked"):
+            continue
+        records.append({
+            "attack_id": gid,
+            "name": group.get("name", ""),
+            "aliases": group.get("aliases") or [],
+            "description": group.get("description", ""),
+            "ttps": group["ttps"],
+        })
+    load_generated_profiles(records)
+
+
+def _build_registry() -> Dict[str, AdversaryProfile]:
+    _ensure_generated_loaded()
+    registry = dict(_GENERATED)
+    for key, profile in _PROFILES.items():
+        registry[key] = profile
+    return registry

@@ -1,8 +1,8 @@
-# RedTeamKit v3.1
+# RedTeamKit v3.2
 
 > **Plan precisely. Validate detections honestly. Leave no ambiguity.**
 
-[![CI](https://github.com/kalikill666/redteamkit/actions/workflows/ci.yml/badge.svg)](https://github.com/kalikill666/redteamkit/actions/workflows/ci.yml)
+[![CI](https://github.com/Panda1847/redteamkit/actions/workflows/ci.yml/badge.svg)](https://github.com/Panda1847/redteamkit/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Runtime](https://img.shields.io/badge/runtime-stdlib--only-1f2937)](#design-principles)
 [![Authorized use](https://img.shields.io/badge/use-authorized%20testing%20only-b91c1c)](#authorized-use)
@@ -11,9 +11,9 @@ RedTeamKit is a local-first, stdlib-only engine for **authorized red-team planni
 
 ## See it in motion
 
-Open the [interactive 3D showcase](https://kalikill666.github.io/redteamkit/showcase.html) for a live graph of the planning → execution → detection → reporting loop, animated captions, and a guided architecture tour.
+Open the [interactive 3D showcase](https://Panda1847.github.io/redteamkit/showcase.html) for a live graph of the planning → execution → detection → reporting loop, animated captions, and a guided architecture tour.
 
-![RedTeamKit architecture](https://raw.githubusercontent.com/kalikill666/redteamkit/main/docs/architecture.svg)
+![RedTeamKit architecture](https://raw.githubusercontent.com/Panda1847/redteamkit/main/docs/architecture.svg)
 
 ## Why this repo feels different
 
@@ -28,7 +28,7 @@ Open the [interactive 3D showcase](https://kalikill666.github.io/redteamkit/show
 ### From a checkout
 
 ```bash
-git clone https://github.com/kalikill666/redteamkit.git
+git clone https://github.com/Panda1847/redteamkit.git
 cd redteamkit
 python3 -m venv .venv
 . .venv/bin/activate
@@ -67,6 +67,15 @@ redteamkit opsec
 
 # Produce an evidence-backed report
 redteamkit report --adversary APT29 --results examples/results.example.json
+
+# Validate the checked-in ATT&CK v20.0 seed and profile registry
+redteamkit validate --json
+
+# Preview the official ATT&CK v20.0 refresh without writing local data
+redteamkit sync --dry-run --json
+
+# Write a refreshed local ATT&CK index (network required)
+redteamkit sync
 ```
 
 If you prefer module execution, every command also works as `python -m redteamkit <command>`.
@@ -93,6 +102,12 @@ redteamkit report \
 ```
 
 `mttd` is measured in minutes. Keep notes tied to actual evidence, detection IDs, timestamps, and analyst observations. Never use the example file as a client finding.
+
+## ATT&CK data lifecycle
+
+The package includes a compact v20.0 seed so campaign planning works on a clean, offline install. `redteamkit sync --dry-run` fetches the official Enterprise STIX 2.1 collection, validates the parser, and reports its version, technique/group counts, digest, and source without changing the checkout. `redteamkit sync` writes the full local index. `redteamkit sync --offline` intentionally exits non-zero so CI can detect accidental network assumptions.
+
+Generated intrusion-set profiles are loaded from the local index. The six curated profiles remain authoritative when names overlap, so `APT29` retains its richer origin, tools, infrastructure, and fidelity notes.
 
 ## Safety model
 
@@ -121,6 +136,7 @@ The core modules are intentionally separable:
 |---|---|
 | `profiles` | APT28/29/41, FIN7, Lazarus, Turla, and custom profiles |
 | `attack` | Technique library, tactics, data sources, detections, mitigations, priority |
+| `attackdata` | Official ATT&CK STIX parser, sync lifecycle, compact local index, and validation |
 | `campaign` | Multi-phase planner with tactic-aware TTP injection |
 | `detection` | Validation matrix and detection-gap analysis |
 | `opsec` | Blank checklist and readiness scoring |

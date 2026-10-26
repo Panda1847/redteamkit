@@ -2,8 +2,8 @@
 OPSEC checklist and risk scoring for red team campaigns.
 """
 
-from dataclasses import dataclass, field
-from typing import List, Dict, Any
+from dataclasses import dataclass
+from typing import Any, Dict, List
 
 
 @dataclass
