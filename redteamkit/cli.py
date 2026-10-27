@@ -24,7 +24,15 @@ from .attackdata import sync as sync_attack_data
 from .campaign import CampaignPlanner
 from .detection import DetectionMatrix
 from .opsec import OpsecChecklist
-from .pentest import TOOL_ADAPTERS, PentestError, build_plan, load_scope, render_plan
+from .pentest import (
+    TOOL_ADAPTERS,
+    PentestError,
+    build_evidence_manifest,
+    build_plan,
+    load_scope,
+    render_markdown,
+    render_plan,
+)
 from .profiles import list_profiles, load_profile
 from .reporting import ReportBuilder
 
@@ -254,17 +262,36 @@ def cmd_pentest_plan(args):
         return 1
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(json.dumps(plan, indent=2) + "\n", encoding="utf-8")
+        rendered = render_markdown(plan) if args.format == "markdown" else json.dumps(plan, indent=2) + "\n"
+        args.output.write_text(rendered, encoding="utf-8")
         print(f"Wrote reviewable plan: {args.output}")
     else:
-        print(json.dumps(plan, indent=2) if args.json else render_plan(plan))
+        if args.format == "markdown":
+            print(render_markdown(plan))
+        else:
+            print(json.dumps(plan, indent=2) if args.json else render_plan(plan))
+    return 0
+
+
+def cmd_pentest_evidence(args):
+    try:
+        manifest = build_evidence_manifest(args.plan, args.evidence_dir)
+    except PentestError as exc:
+        print(f"Evidence manifest rejected: {exc}", file=sys.stderr)
+        return 1
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        print(f"Wrote evidence manifest: {args.output}")
+    else:
+        print(json.dumps(manifest, indent=2))
     return 0
 
 
 def main(argv: Optional[List[str]] = None):
     parser = argparse.ArgumentParser(
         prog="redteamkit",
-        description="RedTeamKit — Authorized red team planning & simulation engine v3.2",
+        description="RedTeamKit — Authorized red team planning & simulation engine v3.3",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -338,8 +365,14 @@ def main(argv: Optional[List[str]] = None):
     plan.add_argument("--tools", help="Comma-separated subset of tools allowed by the scope")
     plan.add_argument("--output-dir", type=Path, default=Path("evidence"))
     plan.add_argument("--output", type=Path, help="Write JSON plan to this path")
+    plan.add_argument("--format", choices=["json", "markdown"], default="json")
     plan.add_argument("--json", action="store_true")
     plan.set_defaults(func=cmd_pentest_plan)
+    evidence = pentest_sub.add_parser("evidence", help="Hash collected evidence and report missing artifacts")
+    evidence.add_argument("--plan", required=True, type=Path)
+    evidence.add_argument("--evidence-dir", type=Path, default=Path("evidence"))
+    evidence.add_argument("--output", type=Path, help="Write the manifest to this path")
+    evidence.set_defaults(func=cmd_pentest_evidence)
 
     args = parser.parse_args(argv)
     return args.func(args)

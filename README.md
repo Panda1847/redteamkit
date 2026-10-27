@@ -1,4 +1,4 @@
-# RedTeamKit v3.3
+# RedTeamKit v3.4
 
 > **Plan precisely. Validate detections honestly. Leave no ambiguity.**
 
@@ -90,6 +90,18 @@ redteamkit pentest plan \
   --scope examples/scope.example.yaml \
   --tools nmap,testssl,zap_baseline,nuclei \
   --output pentest-plan.json
+
+# Generate a Markdown runbook with preflight and stop-condition checklists
+redteamkit pentest plan \
+  --scope examples/scope.example.yaml \
+  --format markdown \
+  --output pentest-runbook.md
+
+# Hash collected evidence and identify missing expected artifacts
+redteamkit pentest evidence \
+  --plan pentest-plan.json \
+  --evidence-dir evidence \
+  --output evidence-manifest.json
 ```
 
 If you prefer module execution, every command also works as `python -m redteamkit <command>`.

@@ -7,6 +7,11 @@ excluded:
   - production.example.com
 abort_contacts:
   - security@example.com
+stop_conditions:
+  - Owner requests stop
+  - Unexpected production impact
+  - Out-of-scope asset observed
+  - Rate-limit or availability alarm triggered
 allowed_tools:
   - nmap
   - testssl
