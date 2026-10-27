@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;600&family=Inter:wght@400&family=Fira+Code&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0B1120; color: #F1F5F9; font-family: 'Inter', sans-serif; overflow: hidden; }
+    .slide-container { width: 1280px; min-height: 720px; position: relative; display: flex; flex-direction: column; padding: 48px; }
+    .display-font { font-family: 'Space Grotesk', sans-serif; }
+    .mono-font { font-family: 'Fira Code', monospace; }
+    
+    /* Asymmetric Grid Lines */
+    .grid-line-v { position: absolute; top: 0; bottom: 0; width: 1px; background-color: #1E293B; }
+    .grid-line-h { position: absolute; left: 0; right: 0; height: 1px; background-color: #1E293B; }
+    
+    .v-line-1 { left: 480px; }
+    .h-line-1 { top: 320px; }
+    
+    .cyan-accent { color: #00E5FF; }
+    .tag { font-size: 16px; position: absolute; top: 48px; right: 48px; color: #94A3B8; }
+    
+    .main-title { font-size: 84px; line-height: 1; font-weight: 600; margin-bottom: 24px; z-index: 10; }
+    .subtitle { font-size: 24px; color: #94A3B8; max-width: 400px; line-height: 1.5; z-index: 10; }
+    
+    .footer-info { position: absolute; bottom: 48px; left: 48px; font-size: 14px; color: #94A3B8; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="grid-line-v v-line-1"></div>
+    <div class="grid-line-h h-line-1"></div>
+    
+    <div class="tag mono-font">>_ RTK-v3.2</div>
+    
+    <div class="flex-1 flex flex-col justify-center">
+      <h1 class="main-title display-font cyan-primary">
+        RedTeamKit<br/>
+        <span class="text-white">v3.2</span>
+      </h1>
+      <p class="subtitle">
+        ATT&CK v20.0 synchronization, generated profiles, and behavioral safety validation.
+      </p>
+    </div>
+    
+    <div class="footer-info mono-font">
+      01 / 08 — RELEASE BRIEFING
+    </div>
+  </div>
+</body>
+</html>

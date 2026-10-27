@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;600&family=Inter:wght@400&family=Fira+Code&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0B1120; color: #F1F5F9; font-family: 'Inter', sans-serif; overflow: hidden; }
+    .slide-container { width: 1280px; min-height: 720px; position: relative; display: flex; flex-direction: column; padding: 48px; }
+    .display-font { font-family: 'Space Grotesk', sans-serif; }
+    .mono-font { font-family: 'Fira Code', monospace; }
+    
+    .grid-line-v { position: absolute; top: 0; bottom: 0; width: 1px; background-color: #1E293B; }
+    .v-line-1 { left: 480px; }
+    .grid-line-h { position: absolute; left: 0; right: 0; height: 1px; background-color: #1E293B; }
+    .h-line-1 { top: 400px; }
+    
+    .cyan-primary { color: #00E5FF; }
+    .amber-safety { color: #FFB300; }
+    .tag { font-size: 16px; position: absolute; top: 48px; right: 48px; color: #94A3B8; }
+    
+    .heading { font-size: 56px; font-weight: 600; line-height: 1.1; margin-bottom: 24px; z-index: 10; }
+    
+    .code-block { background-color: #0F172A; padding: 32px; border: 1px solid #1E293B; z-index: 10; }
+    .code-line { margin-bottom: 12px; font-size: 18px; }
+    
+    .link-box { margin-top: 48px; z-index: 10; }
+    .repo-link { font-size: 20px; color: #00E5FF; text-decoration: none; border-bottom: 1px solid #00E5FF; padding-bottom: 4px; }
+    
+    .footer-info { position: absolute; bottom: 48px; left: 48px; font-size: 14px; color: #94A3B8; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="grid-line-v v-line-1"></div>
+    <div class="grid-line-h h-line-1"></div>
+    <div class="tag mono-font">>_ RTK-v3.2</div>
+    
+    <div class="flex-1 flex flex-col justify-center">
+      <h2 class="heading display-font cyan-primary">A better foundation for authorized testing.</h2>
+      
+      <div class="code-block mono-font w-full max-w-2xl">
+        <div class="code-line"><span class="text-slate-500">$</span> git clone https://github.com/Panda1847/redteamkit</div>
+        <div class="code-line"><span class="text-slate-500">$</span> cd redteamkit && pip install -e .</div>
+        <div class="code-line"><span class="text-slate-500">$</span> redteamkit sync && redteamkit validate</div>
+      </div>
+      
+      <div class="link-box">
+        <a href="https://github.com/Panda1847/redteamkit" class="repo-link mono-font">github.com/Panda1847/redteamkit</a>
+        <p class="mt-8 text-slate-400 max-w-md">
+          RedTeamKit is for authorized work only. You are responsible for scope, safety, and legal compliance.
+        </p>
+      </div>
+    </div>
+    
+    <div class="footer-info mono-font">
+      08 / 08 — CONCLUSION
+    </div>
+  </div>
+</body>
+</html>

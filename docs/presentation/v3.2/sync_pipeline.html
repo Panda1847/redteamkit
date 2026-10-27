@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;600&family=Inter:wght@400&family=Fira+Code&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0B1120; color: #F1F5F9; font-family: 'Inter', sans-serif; overflow: hidden; }
+    .slide-container { width: 1280px; min-height: 720px; position: relative; display: flex; flex-direction: column; padding: 48px; }
+    .display-font { font-family: 'Space Grotesk', sans-serif; }
+    .mono-font { font-family: 'Fira Code', monospace; }
+    
+    .grid-line-h { position: absolute; left: 0; right: 0; height: 1px; background-color: #1E293B; }
+    .h-line-1 { top: 120px; }
+    
+    .cyan-primary { color: #00E5FF; }
+    .amber-safety { color: #FFB300; }
+    .tag { font-size: 16px; position: absolute; top: 48px; right: 48px; color: #94A3B8; }
+    
+    .heading { font-size: 32px; font-weight: 600; margin-bottom: 24px; }
+    
+    .pipeline-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background-color: #1E293B; flex: 1; border: 1px solid #1E293B; }
+    .pipeline-step { background-color: #0B1120; padding: 32px; display: flex; flex-direction: column; }
+    .step-num { font-size: 14px; color: #94A3B8; margin-bottom: 24px; }
+    .step-title { font-size: 20px; font-weight: 600; margin-bottom: 16px; }
+    .step-desc { font-size: 15px; color: #94A3B8; line-height: 1.6; }
+    
+    .flow-arrow { font-size: 24px; color: #00E5FF; margin-top: auto; }
+    
+    .footer-info { position: absolute; bottom: 48px; left: 48px; font-size: 14px; color: #94A3B8; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="grid-line-h h-line-1"></div>
+    <div class="tag mono-font">>_ RTK-v3.2</div>
+    
+    <div style="height: 120px; display: flex; align-items: flex-end; padding-bottom: 24px;">
+      <h2 class="heading display-font">The ATT&CK sync pipeline</h2>
+    </div>
+    
+    <div class="pipeline-grid">
+      <div class="pipeline-step">
+        <div class="step-num mono-font">01 — FETCH</div>
+        <div class="step-title cyan-primary">Official STIX Source</div>
+        <div class="step-desc">Synchronizes with the official Enterprise STIX 2.1 collection. Validates v20.0 versioning and availability before ingestion.</div>
+        <div class="flow-arrow mono-font">→</div>
+      </div>
+      
+      <div class="pipeline-step">
+        <div class="step-num mono-font">02 — PARSE</div>
+        <div class="step-title cyan-primary">Strict Incompatibility</div>
+        <div class="step-desc">Intentionally fails loudly if the bundle shape deviates from Enterprise norms. Maps Tactic IDs and kill-chain phases.</div>
+        <div class="flow-arrow mono-font">→</div>
+      </div>
+      
+      <div class="pipeline-step">
+        <div class="step-num mono-font">03 — MAP</div>
+        <div class="step-title amber-safety">Strategy Linking</div>
+        <div class="step-desc">Relates techniques to detection strategies. Links intrusion-sets (Groups) to their documented TTP lists for generation.</div>
+        <div class="flow-arrow mono-font">→</div>
+      </div>
+      
+      <div class="pipeline-step">
+        <div class="step-num mono-font">04 — DIGEST</div>
+        <div class="step-title cyan-primary">Deterministic Index</div>
+        <div class="step-desc">Generates a SHA-256 digest of the canonical JSON payload to ensure index integrity and reproducibility across nodes.</div>
+        <div class="flow-arrow mono-font">DONE</div>
+      </div>
+    </div>
+    
+    <div class="footer-info mono-font">
+      03 / 08 — ARCHITECTURE
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;600&family=Inter:wght@400&family=Fira+Code&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0B1120; color: #F1F5F9; font-family: 'Inter', sans-serif; overflow: hidden; }
+    .slide-container { width: 1280px; height: 720px; position: relative; display: flex; flex-direction: column; padding: 28px; }
+    .display-font { font-family: 'Space Grotesk', sans-serif; }
+    .mono-font { font-family: 'Fira Code', monospace; }
+    
+    .grid-line-v { position: absolute; top: 0; bottom: 0; width: 1px; background-color: #1E293B; }
+    .v-line-1 { left: 640px; }
+    
+    .cyan-primary { color: #00E5FF; }
+    .amber-safety { color: #FFB300; }
+    .tag { font-size: 14px; position: absolute; top: 28px; right: 28px; color: #94A3B8; }
+    
+    .heading { font-size: 28px; font-weight: 600; margin-bottom: 20px; line-height: 1.05; }
+    
+    .code-block { background-color: #0F172A; padding: 16px; border-radius: 4px; border: 1px solid #1E293B; margin-bottom: 16px; }
+    .code-line { margin-bottom: 6px; font-size: 13px; line-height: 1.25; }
+    .code-comment { color: #64748B; }
+    
+    .comparison-box { padding: 20px; border: 1px solid #1E293B; border-radius: 4px; }
+    .comparison-title { font-size: 15px; font-weight: 600; margin-bottom: 16px; color: #94A3B8; text-transform: uppercase; }
+    
+    .metric-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #1E293B; padding-bottom: 6px; }
+    .metric-label { font-size: 13px; color: #94A3B8; }
+    .metric-value { font-size: 13px; }
+    
+    .footer-info { position: absolute; bottom: 28px; left: 28px; font-size: 13px; color: #94A3B8; }
+    
+    /* Adjustments to constrain layout within 720px */
+    .left-column { width: 592px; padding-right: 36px; }
+    .right-column { flex: 1; padding-left: 16px; }
+    p.note { font-size: 13px; color: #94A3B8; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="grid-line-v v-line-1"></div>
+    <div class="tag mono-font">>_ RTK-v3.2</div>
+    
+    <h2 class="heading display-font">Offline by default. Refresh when you choose.</h2>
+    
+    <div class="flex-1 flex flex-row" style="min-height:0;">
+      <!-- Left 50% -->
+      <div class="left-column">
+        <div class="comparison-title mono-font">THE CLI LIFECYCLE</div>
+        
+        <div class="code-block mono-font">
+          <div class="code-line"><span class="code-comment"># Validate local seed (offline)</span></div>
+          <div class="code-line"><span class="cyan-primary">redteamkit</span> validate --json</div>
+          <div class="code-line"></div>
+          <div class="code-line"><span class="code-comment"># Preview remote v20.0</span></div>
+          <div class="code-line"><span class="cyan-primary">redteamkit</span> sync --dry-run</div>
+          <div class="code-line"></div>
+          <div class="code-line"><span class="code-comment"># Refresh local index</span></div>
+          <div class="code-line"><span class="cyan-primary">redteamkit</span> sync</div>
+          <div class="code-line"></div>
+          <div class="code-line"><span class="code-comment"># CI enforcement guard</span></div>
+          <div class="code-line"><span class="cyan-primary">redteamkit</span> sync --offline</div>
+        </div>
+        
+        <p class="note italic">
+          v3.2 preserves zero-config offline planning while enabling explicit synchronization with official threat intelligence.
+        </p>
+      </div>
+      
+      <!-- Right 50% -->
+      <div class="right-column">
+        <div class="comparison-title mono-font">INDEX COMPARISON</div>
+        
+        <div class="comparison-box mb-4">
+          <div class="metric-row">
+            <span class="metric-label">Compact Seed Index</span>
+            <span class="amber-safety mono-font">OFFLINE</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">File Size</span>
+            <span class="mono-font">264 KB</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Technique Coverage</span>
+            <span class="mono-font">149 (Curated)</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Intrusion Groups</span>
+            <span class="mono-font">174 (Active)</span>
+          </div>
+        </div>
+        
+        <div class="comparison-box">
+          <div class="metric-row">
+            <span class="metric-label">Full Refreshed Index</span>
+            <span class="cyan-primary mono-font">LIVE</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">File Size</span>
+            <span class="mono-font">~1.5 MB</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Technique Coverage</span>
+            <span class="mono-font">706 (Enterprise)</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Detection Strategies</span>
+            <span class="mono-font">Linked (v20.0)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-info mono-font">
+      04 / 08 — DATA LIFECYCLE
+    </div>
+  </div>
+</body>
+</html>

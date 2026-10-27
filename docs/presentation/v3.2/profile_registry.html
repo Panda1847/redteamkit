@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;600&family=Inter:wght@400&family=Fira+Code&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0B1120; color: #F1F5F9; font-family: 'Inter', sans-serif; overflow: hidden; }
+    .slide-container { width: 1280px; min-height: 720px; position: relative; display: flex; flex-direction: column; padding: 48px; }
+    .display-font { font-family: 'Space Grotesk', sans-serif; }
+    .mono-font { font-family: 'Fira Code', monospace; }
+    
+    .grid-line-v { position: absolute; top: 0; bottom: 0; width: 1px; background-color: #1E293B; }
+    .v-line-1 { left: 512px; }
+    
+    .cyan-primary { color: #00E5FF; }
+    .magenta-accent { color: #D500F9; }
+    .tag { font-size: 16px; position: absolute; top: 48px; right: 48px; color: #94A3B8; }
+    
+    .heading { font-size: 32px; font-weight: 600; margin-bottom: 40px; }
+    
+    .profile-card { border: 1px solid #1E293B; padding: 24px; margin-bottom: 24px; }
+    .card-label { font-size: 12px; color: #94A3B8; margin-bottom: 12px; text-transform: uppercase; }
+    .card-title { font-size: 24px; font-weight: 600; margin-bottom: 16px; }
+    .card-features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .feature-item { font-size: 14px; color: #94A3B8; display: flex; align-items: center; }
+    .feature-dot { width: 6px; height: 6px; background: #00E5FF; border-radius: 50%; margin-right: 12px; }
+    
+    .precedence-box { border-left: 1px solid #D500F9; padding: 32px; margin-top: 48px; }
+    .precedence-title { font-size: 20px; font-weight: 600; margin-bottom: 16px; color: #D500F9; }
+    
+    .footer-info { position: absolute; bottom: 48px; left: 48px; font-size: 14px; color: #94A3B8; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="grid-line-v v-line-1"></div>
+    <div class="tag mono-font">>_ RTK-v3.2</div>
+    
+    <h2 class="heading display-font">Curated expertise + generated coverage</h2>
+    
+    <div class="flex-1 flex flex-row">
+      <!-- Left 40% -->
+      <div style="width: 464px; padding-right: 48px;">
+        <div class="profile-card" style="border-color: #00E5FF;">
+          <div class="card-label mono-font">HAND-MAINTAINED</div>
+          <div class="card-title cyan-primary">Curated Registry</div>
+          <div class="card-features">
+            <div class="feature-item"><span class="feature-dot"></span>Origin Detail</div>
+            <div class="feature-item"><span class="feature-dot"></span>Tool Chains</div>
+            <div class="feature-item"><span class="feature-dot"></span>Infra Patterns</div>
+            <div class="feature-item"><span class="feature-dot"></span>Fidelity Notes</div>
+          </div>
+        </div>
+        
+        <div class="profile-card">
+          <div class="card-label mono-font">DYNAMIC</div>
+          <div class="card-title">Generated Index</div>
+          <div class="card-features">
+            <div class="feature-item"><span class="feature-dot" style="background: #94A3B8;"></span>STIX Metadata</div>
+            <div class="feature-item"><span class="feature-dot" style="background: #94A3B8;"></span>Alias Mapping</div>
+            <div class="feature-item"><span class="feature-dot" style="background: #94A3B8;"></span>TTP Coverage</div>
+            <div class="feature-item"><span class="feature-dot" style="background: #94A3B8;"></span>Group Stats</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right 60% -->
+      <div class="flex-1 pl-12">
+        <div class="precedence-box">
+          <div class="precedence-title display-font">The Authoritative Split</div>
+          <p class="text-lg text-slate-300 leading-relaxed mb-8">
+            v3.2 introduces a dual-registry architecture. Curated profiles remain authoritative for high-fidelity emulation, while the generated index provides broad coverage for the full ATT&CK corpus.
+          </p>
+          <div class="bg-slate-900 p-6 border border-slate-800 mono-font text-sm">
+            <div class="mb-4 text-slate-400">// Precedence Example: APT29</div>
+            <div class="flex justify-between py-2 border-b border-slate-800">
+              <span class="text-slate-500">Source</span>
+              <span class="text-white">hand-maintained</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-800">
+              <span class="text-slate-500">TTP Logic</span>
+              <span class="cyan-primary">Curated Fidelity</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-800">
+              <span class="text-slate-500">Aliases</span>
+              <span class="text-white">Cozy Bear, Nobelium...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-info mono-font">
+      05 / 08 — PROFILES
+    </div>
+  </div>
+</body>
+</html>

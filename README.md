@@ -13,6 +13,8 @@ RedTeamKit is a local-first, stdlib-only engine for **authorized red-team planni
 
 Open the [interactive 3D showcase](https://Panda1847.github.io/redteamkit/showcase.html) for a live graph of the planning → execution → detection → reporting loop, animated captions, and a guided architecture tour.
 
+Read the [RedTeamKit v3.2 release briefing](docs/presentation/README.md) for the ATT&CK v20.0 synchronization architecture, offline seed lifecycle, generated profile registry, and verification results.
+
 ![RedTeamKit architecture](https://raw.githubusercontent.com/Panda1847/redteamkit/main/docs/architecture.svg)
 
 ## Why this repo feels different

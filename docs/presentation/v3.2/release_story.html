@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;600&family=Inter:wght@400&family=Fira+Code&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0B1120; color: #F1F5F9; font-family: 'Inter', sans-serif; overflow: hidden; }
+    .slide-container { width: 1280px; min-height: 720px; position: relative; display: flex; flex-direction: column; padding: 48px; }
+    .display-font { font-family: 'Space Grotesk', sans-serif; }
+    .mono-font { font-family: 'Fira Code', monospace; }
+    
+    .grid-line-v { position: absolute; top: 0; bottom: 0; width: 1px; background-color: #1E293B; }
+    .v-line-1 { left: 768px; } /* 60/40 split */
+    
+    .cyan-primary { color: #00E5FF; }
+    .magenta-accent { color: #D500F9; }
+    .tag { font-size: 16px; position: absolute; top: 48px; right: 48px; color: #94A3B8; }
+    
+    .heading { font-size: 32px; font-weight: 600; margin-bottom: 48px; }
+    
+    .timeline-container { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding-top: 24px; }
+    .timeline-item { display: flex; align-items: flex-start; margin-bottom: 40px; }
+    .timeline-node { width: 12px; height: 12px; border: 2px solid #00E5FF; background: #0B1120; border-radius: 50%; margin-top: 6px; margin-right: 24px; z-index: 10; }
+    .timeline-line { position: absolute; left: 53px; top: 180px; bottom: 200px; width: 1px; background: #1E293B; z-index: 0; }
+    
+    .item-year { font-size: 14px; color: #94A3B8; margin-bottom: 4px; }
+    .item-title { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+    .item-desc { font-size: 16px; color: #94A3B8; max-width: 500px; }
+    
+    .verdict-box { padding: 32px; border-left: 1px solid #D500F9; }
+    .verdict-label { font-size: 14px; color: #D500F9; margin-bottom: 12px; text-transform: uppercase; }
+    
+    .footer-info { position: absolute; bottom: 48px; left: 48px; font-size: 14px; color: #94A3B8; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="grid-line-v v-line-1"></div>
+    <div class="tag mono-font">>_ RTK-v3.2</div>
+    
+    <div class="flex-1 flex flex-row">
+      <!-- Left 60% Content -->
+      <div style="width: 720px;">
+        <h2 class="heading display-font">What changed in v3.2</h2>
+        
+        <div class="timeline-container relative">
+          <div class="timeline-line"></div>
+          
+          <div class="timeline-item">
+            <div class="timeline-node"></div>
+            <div>
+              <div class="item-year mono-font">v3.0 — CORE ARCHITECTURE</div>
+              <div class="item-title">Standard Library Foundation</div>
+              <div class="item-desc">Introduced the stdlib-only engine for planning, detection validation, and reporting. Static ATT&CK seed.</div>
+            </div>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-node" style="border-color: #D500F9;"></div>
+            <div>
+              <div class="item-year mono-font">v3.1 — PLATFORM REFINEMENT</div>
+              <div class="item-title">Deployment & CI</div>
+              <div class="item-desc">Expanded reporting capabilities and integrated full CI testing across Python 3.9–3.13.</div>
+            </div>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-node" style="background: #00E5FF;"></div>
+            <div>
+              <div class="item-year mono-font cyan-primary">v3.2 — DATA DYNAMICS</div>
+              <div class="item-title cyan-primary">ATT&CK Sync & Validation</div>
+              <div class="item-desc">Living STIX 2.1 parser, generated profiles, strict behavioral safety, and verified v20.0 synchronization.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right 40% Verdict -->
+      <div class="flex-1 flex items-center justify-center pl-12">
+        <div class="verdict-box">
+          <div class="verdict-label mono-font">THE VERDICT</div>
+          <p class="text-2xl leading-relaxed">
+            From a <span class="cyan-primary">static planning tool</span> to a <span class="cyan-primary">versioned data engine</span> capable of tracking the evolving threat landscape.
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-info mono-font">
+      02 / 08 — EVOLUTION
+    </div>
+  </div>
+</body>
+</html>

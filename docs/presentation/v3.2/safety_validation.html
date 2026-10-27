@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;600&family=Inter:wght@400&family=Fira+Code&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0B1120; color: #F1F5F9; font-family: 'Inter', sans-serif; overflow: hidden; }
+    .slide-container { width: 1280px; height: 720px; position: relative; display: flex; flex-direction: column; padding: 32px; }
+    .display-font { font-family: 'Space Grotesk', sans-serif; }
+    .mono-font { font-family: 'Fira Code', monospace; }
+    
+    .grid-line-h { position: absolute; left: 32px; right: 32px; height: 1px; background-color: #1E293B; }
+    .h-line-1 { top: 96px; }
+    
+    .cyan-primary { color: #00E5FF; }
+    .amber-safety { color: #FFB300; }
+    .tag { font-size: 14px; position: absolute; top: 28px; right: 32px; color: #94A3B8; }
+    
+    .heading { font-size: 28px; font-weight: 600; margin-bottom: 12px; line-height: 1.05; }
+    
+    .validation-table { width: 100%; border-collapse: collapse; margin-top: 18px; }
+    .validation-table th { text-align: left; padding: 10px; color: #94A3B8; font-family: 'Fira Code', monospace; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid #1E293B; }
+    .validation-table td { padding: 12px 10px; border-bottom: 1px solid #1E293B; font-size: 14px; vertical-align: top; }
+    
+    .status-pill { padding: 3px 10px; border: 1px solid; font-size: 11px; font-family: 'Fira Code', monospace; border-radius: 6px; display: inline-block; }
+    .status-alert { border-color: #FFB300; color: #FFB300; }
+    .status-pass { border-color: #00E5FF; color: #00E5FF; }
+    
+    .footer-info { position: absolute; bottom: 28px; left: 32px; font-size: 13px; color: #94A3B8; }
+    
+    /* compact header area */
+    .header-row { height: 80px; display: flex; align-items: flex-end; padding-bottom: 8px; }
+    .note-box { margin-top: 12px; padding: 12px; border-radius: 8px; }
+    /* ensure inner content doesn't overflow the fixed slide */
+    .content { overflow: hidden; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="grid-line-h h-line-1"></div>
+    <div class="tag mono-font">>_ RTK-v3.2</div>
+    
+    <div class="header-row">
+      <h2 class="heading display-font">Safety is executable behavior</h2>
+    </div>
+    
+    <div class="flex-1 content">
+      <table class="validation-table">
+        <thead>
+          <tr>
+            <th>Safety Control</th>
+            <th>V3.2 Enforcement Mechanism</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Destructive Filtering</td>
+            <td>T1486/T1490/T1485 excluded by default in all campaign planners, including custom phases.</td>
+            <td><span class="status-pill status-pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td>Input Validation</td>
+            <td>CampaignError raised for profile/template mismatches; actionable guidance for seed vs sync states.</td>
+            <td><span class="status-pill status-pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td>Offline Guard</td>
+            <td>Sync tool intentionally fails non-zero in offline mode to prevent accidental network leaks.</td>
+            <td><span class="status-pill status-alert">STRICT</span></td>
+          </tr>
+          <tr>
+            <td>Evidence-Backing</td>
+            <td>Reporting engine refuses to generate scores without a verified detection-results JSON.</td>
+            <td><span class="status-pill status-pass">ENFORCED</span></td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="mt-4 note-box border border-amber-500/30 bg-amber-500/6">
+        <p class="text-amber-500 mono-font text-sm mb-1">>_ VALIDATION NOTE</p>
+        <p class="text-base text-slate-300">
+          RTK v3.2 transitions from "best effort" safety to <span class="amber-safety">structural enforcement</span>, ensuring engagements stay within authorized behavioral bounds by default.
+        </p>
+      </div>
+    </div>
+    
+    <div class="footer-info mono-font">
+      06 / 08 — SAFETY
+    </div>
+  </div>
+</body>
+</html>
