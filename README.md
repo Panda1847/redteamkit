@@ -1,4 +1,4 @@
-# RedTeamKit v3.2
+# RedTeamKit v3.3
 
 > **Plan precisely. Validate detections honestly. Leave no ambiguity.**
 
@@ -78,6 +78,18 @@ redteamkit sync --dry-run --json
 
 # Write a refreshed local ATT&CK index (network required)
 redteamkit sync
+
+# Validate an explicit authorized scope file
+redteamkit pentest scope --scope examples/scope.example.yaml
+
+# List the reviewable tool adapters and official repositories
+redteamkit pentest tools
+
+# Generate a plan-only assessment runbook; commands are not executed
+redteamkit pentest plan \
+  --scope examples/scope.example.yaml \
+  --tools nmap,testssl,zap_baseline,nuclei \
+  --output pentest-plan.json
 ```
 
 If you prefer module execution, every command also works as `python -m redteamkit <command>`.
@@ -110,6 +122,14 @@ redteamkit report \
 The package includes a compact v20.0 seed so campaign planning works on a clean, offline install. `redteamkit sync --dry-run` fetches the official Enterprise STIX 2.1 collection, validates the parser, and reports its version, technique/group counts, digest, and source without changing the checkout. `redteamkit sync` writes the full local index. `redteamkit sync --offline` intentionally exits non-zero so CI can detect accidental network assumptions.
 
 Generated intrusion-set profiles are loaded from the local index. The six curated profiles remain authoritative when names overlap, so `APT29` retains its richer origin, tools, infrastructure, and fidelity notes.
+
+## Authorized pentest planner
+
+The `pentest` module turns an approved scope into a reviewable assessment runbook. It validates included and excluded assets, emergency contacts, allowed tools, and safety rules before generating shell-escaped commands and deterministic evidence paths. The initial adapters cover Nmap, Nuclei, OWASP ZAP baseline, and testssl.sh, with links to their official repositories in `redteamkit pentest tools`.
+
+This is deliberately plan-only. RedTeamKit does not clone arbitrary GitHub scripts, execute scanners, exploit targets, bypass authentication, or launch destructive actions. A human operator must review the scope and approve each generated step using the tool's own installation and safety guidance.
+
+See [Pentest tool adapters](docs/pentest-tools.md) for official project links, adapter boundaries, and installation guidance.
 
 ## Safety model
 
@@ -144,6 +164,7 @@ The core modules are intentionally separable:
 | `opsec` | Blank checklist and readiness scoring |
 | `reporting` | Executive summary, technical timeline, and detection appendix |
 | `cli` | Human-friendly command-line interface |
+| `pentest` | Scope validation, vetted tool adapters, dry-run command plans, and evidence manifests |
 
 ## Development
 

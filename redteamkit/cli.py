@@ -15,6 +15,7 @@ Usage examples:
 import argparse
 import json
 import sys
+from pathlib import Path
 from typing import List, Optional
 
 from .attack import AttackLibrary, Tactic
@@ -23,6 +24,7 @@ from .attackdata import sync as sync_attack_data
 from .campaign import CampaignPlanner
 from .detection import DetectionMatrix
 from .opsec import OpsecChecklist
+from .pentest import TOOL_ADAPTERS, PentestError, build_plan, load_scope, render_plan
 from .profiles import list_profiles, load_profile
 from .reporting import ReportBuilder
 
@@ -225,6 +227,40 @@ def cmd_validate(args):
     return 0
 
 
+def cmd_pentest_tools(args):
+    for adapter in TOOL_ADAPTERS.values():
+        print(f"{adapter.name:14} {adapter.category:24} {adapter.repository}")
+        print(f"{'':14} {adapter.purpose}")
+    return 0
+
+
+def cmd_pentest_scope(args):
+    try:
+        scope = load_scope(args.scope)
+    except PentestError as exc:
+        print(f"Scope rejected: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps(scope.to_dict(), indent=2) if args.json else "SCOPE VALID\n" + json.dumps(scope.to_dict(), indent=2))
+    return 0
+
+
+def cmd_pentest_plan(args):
+    try:
+        scope = load_scope(args.scope)
+        tools = [item.strip() for item in args.tools.split(",")] if args.tools else None
+        plan = build_plan(scope, tools=tools, output_dir=args.output_dir)
+    except PentestError as exc:
+        print(f"Pentest plan rejected: {exc}", file=sys.stderr)
+        return 1
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(json.dumps(plan, indent=2) + "\n", encoding="utf-8")
+        print(f"Wrote reviewable plan: {args.output}")
+    else:
+        print(json.dumps(plan, indent=2) if args.json else render_plan(plan))
+    return 0
+
+
 def main(argv: Optional[List[str]] = None):
     parser = argparse.ArgumentParser(
         prog="redteamkit",
@@ -287,6 +323,23 @@ def main(argv: Optional[List[str]] = None):
     p = sub.add_parser("validate", help="Validate the local ATT&CK index and profile registry")
     p.add_argument("--json", action="store_true", help="Emit JSON")
     p.set_defaults(func=cmd_validate)
+
+    # Authorized pentest planning and tool adapters
+    p = sub.add_parser("pentest", help="Plan an authorized pentest without executing tools")
+    pentest_sub = p.add_subparsers(dest="pentest_command", required=True)
+    tools = pentest_sub.add_parser("tools", help="List vetted tool adapters and official repositories")
+    tools.set_defaults(func=cmd_pentest_tools)
+    scope = pentest_sub.add_parser("scope", help="Validate an explicit JSON or simple YAML scope file")
+    scope.add_argument("--scope", required=True, type=Path)
+    scope.add_argument("--json", action="store_true")
+    scope.set_defaults(func=cmd_pentest_scope)
+    plan = pentest_sub.add_parser("plan", help="Generate a reviewable, plan-only assessment runbook")
+    plan.add_argument("--scope", required=True, type=Path)
+    plan.add_argument("--tools", help="Comma-separated subset of tools allowed by the scope")
+    plan.add_argument("--output-dir", type=Path, default=Path("evidence"))
+    plan.add_argument("--output", type=Path, help="Write JSON plan to this path")
+    plan.add_argument("--json", action="store_true")
+    plan.set_defaults(func=cmd_pentest_plan)
 
     args = parser.parse_args(argv)
     return args.func(args)

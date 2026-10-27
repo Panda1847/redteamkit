@@ -1,0 +1,20 @@
+engagement: "Authorized staging assessment"
+authorization: "Written authorization reference: ROE-2026-001"
+included:
+  - staging.example.com
+  - https://staging.example.com
+excluded:
+  - production.example.com
+abort_contacts:
+  - security@example.com
+allowed_tools:
+  - nmap
+  - testssl
+  - zap_baseline
+  - nuclei
+rules:
+  destructive_techniques: false
+  production_testing: false
+testing_window:
+  start: "2026-11-01T22:00:00Z"
+  end: "2026-11-02T02:00:00Z"

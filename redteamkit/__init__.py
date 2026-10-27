@@ -1,6 +1,6 @@
 """
 RedTeamKit — High-fidelity authorized red team planning & simulation engine.
-Version: 3.2.0
+Version: 3.3.0
 
 Modules:
   - profiles      Adversary / APT profiles
@@ -12,7 +12,7 @@ Modules:
   - eng           Social engineering campaign designer
 """
 
-__version__ = "3.2.0"
+__version__ = "3.3.0"
 __author__ = "RedTeamKit"
 
 from .attack import AttackLibrary, Tactic, Technique, get_technique
@@ -20,6 +20,7 @@ from .attackdata import AttackDataError, load_index, sync
 from .campaign import Campaign, CampaignPlanner, Phase
 from .detection import DetectionMatrix, GapAnalyzer
 from .opsec import OpsecChecklist, score_opsec
+from .pentest import PentestError, Scope, build_plan, load_scope
 from .profiles import AdversaryProfile, list_profiles, load_profile
 from .reporting import ReportBuilder
 
@@ -31,4 +32,5 @@ __all__ = [
     "ReportBuilder",
     "OpsecChecklist", "score_opsec",
     "AttackDataError", "load_index", "sync",
+    "PentestError", "Scope", "build_plan", "load_scope",
 ]
